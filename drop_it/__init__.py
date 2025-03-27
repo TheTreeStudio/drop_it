@@ -25,8 +25,8 @@ import random
 
 bl_info = {
     "name": "Drop It",
-    "author": "Andreas Aust",
-    "version": (1, 2),
+    "author": "Andreas Aust,TheTree",
+    "version": (1, 2, 1),
     "blender": (2, 80, 0),
     "location": "View3D > Object Mode > Object Context Menu (W / Right Click on Object)",
     "description": "Drop Objects to Ground or Surface",
@@ -223,7 +223,7 @@ class DROPIT_OT_drop_it(bpy.types.Operator):
                 view_layer.update()
 
                 # GET LOWEST VERTICES OR ORIGIN
-                if self.drop_by == "lw_vertex":
+                if self.drop_by == "lw_vertex" and obj.type == 'MESH' and len(obj.data.vertices) > 0:#增加顶点数量判断
                     # DROP BY LOWEST VERTEX
                     lowest_verts = get_lowest_verts(obj)
                 else:
@@ -336,6 +336,9 @@ def rotate_object(obj, loc, normal):
 
 def get_lowest_verts(obj):
     verts = obj.data.vertices
+    if len(verts) == 0:  # 增加空网格保护逻辑
+        return [obj.location]
+    
     count = len(verts)
     co = numpy.zeros(count * 3, dtype=numpy.float32)
     verts.foreach_get("co", co)
